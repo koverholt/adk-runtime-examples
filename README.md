@@ -25,17 +25,25 @@ directly in Python, without the need to use external tooling or commands.
 
 2. Navigate to the directory with the Python script:
 
-    ```cd adk-runtime-examples/adk-agent```
+    ```cd adk-runtime-examples```
 
-3. Define your `GOOGLE_API_KEY` from [Google AI Studio](https://aistudio.google.com/):
+3. Install dependencies:
+
+    ```pip install -r requirements.txt```
+
+4. Define your `GOOGLE_API_KEY` from [Google AI Studio](https://aistudio.google.com/):
 
     ```export GOOGLE_API_KEY=AIzaXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX```
 
-4. Run the Python script:
+5. Navigate to the directory with the Python script:
+
+    ```cd adk-agent```
+
+6. Run the Python script:
 
     ```python agent.py```
 
-5. You should see output similar to the following:
+7. You should see output similar to the following:
 
     ```
     $ python agent.py
