@@ -23,7 +23,7 @@ directly in Python, without the need to use external tooling or commands.
 
     ```git clone https://github.com/koverholt/adk-runtime-examples.git```
 
-2. Navigate to the directory with the Python script:
+2. Navigate to the root directory of the repository:
 
     ```cd adk-runtime-examples```
 
