@@ -1,8 +1,8 @@
 # adk-runtime-examples
 
 Examples of running
-[Agent Development Kit (ADK)](https://google.github.io/adk-docs/) Agents in
-Python.
+[Agent Development Kit (ADK)](https://google.github.io/adk-docs/) agents
+directly in Python.
 
 ## Overview
 
