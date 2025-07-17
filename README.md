@@ -38,6 +38,8 @@ directly in Python, without the need to use external tooling or commands.
 5. You should see output similar to the following:
 
     ```
+    $ python agent.py
+
     ** User says: What is the spaceflight news for today?
 
     --- Tool: get_spaceflight_news called for date: 2025-07-17 ---
