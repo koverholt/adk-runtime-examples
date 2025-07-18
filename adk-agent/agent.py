@@ -5,9 +5,6 @@ from google.adk.agents import Agent
 from google.adk.runners import InMemoryRunner
 from google.genai import types
 
-# Define today's date for later usage in prompt template
-TODAY = str(datetime.datetime.now().isoformat())
-
 # Define a tool for agent to use to get space flight news
 def get_spaceflight_news(date: str) -> dict:
     """
@@ -19,6 +16,9 @@ def get_spaceflight_news(date: str) -> dict:
     print(f"--- Tool: get_spaceflight_news called for date: {date} ---")
     response = requests.get("https://api.spaceflightnewsapi.net/v4/articles/")
     return response.json()
+
+# Define today's date for later usage in prompt template
+TODAY = str(datetime.datetime.now().isoformat())
 
 # Agent definition
 spaceflight_news_agent = Agent(
