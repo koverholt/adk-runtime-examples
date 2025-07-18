@@ -1,9 +1,15 @@
-import asyncio
 import datetime
 import requests
 from google.adk.agents import Agent
-from google.adk.runners import InMemoryRunner
+from google.adk.sessions import InMemorySessionService
+from google.adk.runners import Runner
 from google.genai import types
+
+# Define constants
+APP_NAME = "weather"
+USER_ID = "user"
+SESSION_ID = "session"
+MODEL_ID = "gemini-2.5-pro"
 
 # Define a tool for agent to use to get space flight news
 def get_spaceflight_news(date: str) -> dict:
@@ -15,6 +21,7 @@ def get_spaceflight_news(date: str) -> dict:
     """
     print(f"--- Tool: get_spaceflight_news called for date: {date} ---")
     response = requests.get("https://api.spaceflightnewsapi.net/v4/articles/")
+    print(type(response.json()))
     return response.json()
 
 # Define today's date for later usage in prompt template
@@ -23,9 +30,10 @@ TODAY = str(datetime.datetime.now().isoformat())
 # Agent definition
 spaceflight_news_agent = Agent(
     name="spaceflight_news_agent",
-    model="gemini-2.5-pro",
+    model=MODEL_ID,
     description="Provides space flight news information for a given date.",
     instruction="You are a helpful space flight news assistant."
+                "Use the tool 'get_spaceflight_news' to retrieve space flight news"
                 "If the user gives a partial date, assume a specific date."
                 "If the tool returns an error, inform the user politely. "
                 "If the tool is successful, present the space flight news"
@@ -34,38 +42,39 @@ spaceflight_news_agent = Agent(
     tools=[get_spaceflight_news],
 )
 
-# Agent runner
-runner = InMemoryRunner(
-    agent=spaceflight_news_agent,
-    app_name='my_app',
+session_service = InMemorySessionService()
+
+session = session_service.create_session_sync(
+    app_name=APP_NAME,
+    user_id=USER_ID,
+    session_id=SESSION_ID
 )
 
-# Create a session for our agent
-def create_session():
-    session = asyncio.run(runner.session_service.create_session(
-        app_name='my_app', user_id='user'
-    ))
-    return session
+print(f"Session created: App='{APP_NAME}', User='{USER_ID}', Session='{SESSION_ID}'")
 
-# Define a convenience function to query the agent
-def run_agent(session_id: str, new_message: str):
-    content = types.Content(
-        role='user', parts=[types.Part.from_text(text=new_message)]
-    )
-    print('** User says:', new_message)
-    for event in runner.run(
-        user_id='user',
-        session_id=session_id,
-        new_message=content,
-    ):
-        if event.content.parts and event.content.parts[0].text:
-            print(f'** {event.author}: {event.content.parts[0].text}')
-    print()
+runner = Runner(
+    agent=spaceflight_news_agent,
+    app_name=APP_NAME,
+    session_service=session_service
+)
+
+print(f"Runner created for agent '{runner.agent.name}'.")
+
+def query_agent(prompt: str):
+    print("User input:", prompt)
+    response = runner.run(new_message=types.Content(
+            role="user",
+            parts=[types.Part(text=prompt)]), user_id="user", session_id="session")
+    import time
+    time.sleep(10)
+    for message in response:
+        agent_output = message.content
+        print("Agent output:", agent_output)
+        print()
+        return agent_output
 
 # Define sample prompts to use when the script is run
-if __name__ == '__main__':
-    session = create_session()
-    run_agent(session.id, "Hello!")
-    run_agent(session.id, "What is the spaceflight news for today?")
-    run_agent(session.id, "What is the spaceflight news as of Jan 2022?")
-    run_agent(session.id, "What is the spaceflight news as of Jan 1900?")
+query_agent("Hello!")
+query_agent("What is the spaceflight news for today?")
+query_agent("What is the spaceflight news as of Jan 2022?")
+query_agent("What is the spaceflight news as of Jan 1900?")
